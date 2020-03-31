@@ -3,17 +3,45 @@ import * as ProfileActions from './profile.actions';
 import { ProfileState } from './../feature-profile-details/src/lib/models/profile-state.model';
 
 export const initialState: ProfileState = {
-    userProfile: null
+    userProfile: null,
+    isProfileLoading: false,
+    users: null,
+    isUsersLoading: false
 }
 
-const scoreboardReducer = createReducer(
+const userProfileReducer = createReducer(
     initialState,
-    on(ProfileActions.getProfile, state => { 
+    on(ProfileActions.getProfile, state => {
         // Write code here
-        return { ...state }
+        return { ...state, isProfileLoading: true }
+    }),
+    on(ProfileActions.getUserProfileSuccess, (state, {profile} ) => {
+      return { ...state, userProfile: profile, isProfileLoading: false }
+    }),
+    on(ProfileActions.getUserProfileFailed, state => {
+      return { ...state, userProfile: null, isProfileLoading: false }
+    }),
+    on(ProfileActions.getUsers, state => {
+      return { ...state, isUsersLoading: true}
+    }),
+    on(ProfileActions.getUsersSuccess, (state, {profiles}) => {
+      return { ...state, isUsersLoading: false, users: profiles}
+    }),
+    on(ProfileActions.getUsersFailed, state => {
+      return { ...state, isUsersLoading: false}
+    }),
+    on(ProfileActions.setUserProfile, (state, {index}) => {
+      let profile = null;
+
+      if (state.users && index >=0 && index < state.users.length) {
+        profile = state.users[index];
+      }
+      return { ...state, userProfile: profile};
     })
   );
 
   export function reducer(state: ProfileState | undefined, action: Action) {
-    return scoreboardReducer(state, action);
+    return userProfileReducer(state, action);
   }
+
+  export const profileFeatureKey = 'profile';

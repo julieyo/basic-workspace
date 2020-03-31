@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { UiModule } from '../../../../libs/ui/src';
@@ -11,11 +12,13 @@ import { environment } from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { InfoComponent } from './info.component';
+import { ProfileListGuard } from './feature-profile-list/feature-profile-list.guard';
 
 @NgModule({
   declarations: [AppComponent, InfoComponent],
   imports: [
     BrowserModule,
+    HttpClientModule,
     UiModule,
     MatToolbarModule,
     RouterModule.forRoot(
@@ -27,10 +30,18 @@ import { InfoComponent } from './info.component';
         },
         {
           path: 'profile-details',
-          pathMatch: 'full',
           loadChildren: () =>
             import('@monofunworkspace/feature-profile-details').then(
               module => module.FeatureProfileDetailsModule
+            )
+        },
+        {
+          path: 'profile-list',
+          pathMatch: 'full',
+          canActivate: [ProfileListGuard],
+          loadChildren: () =>
+            import('./feature-profile-list/feature-profile-list.module').then(
+              module => module.FeatureProfileListModule
             )
         }
       ],
@@ -50,7 +61,7 @@ import { InfoComponent } from './info.component';
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     BrowserAnimationsModule
   ],
-  providers: [],
+  providers: [ProfileListGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
